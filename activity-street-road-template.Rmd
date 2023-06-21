@@ -1,6 +1,6 @@
 ---
 title: "Activity: Street or Road?"
-author: "YOUR NAME HERE"
+author: "Madeline Mucciolo"
 output: html_notebook
 ---
 
@@ -8,22 +8,67 @@ output: html_notebook
 
 ```{r}
 #load libraries 
+library(tidyverse)
 
 #load in the data here 
 # we will only be using the "street-addresses.csv" file from the text
-
-
-
+Addresses <- read_csv("https://mdbeckman.github.io/dcSupplement/data/street-addresses.csv")
 ```
+
+## Inspect Data
+```{r}
+head(Addresses)
+sample_n(Addresses, 10)
+```
+
 
 ## Recreate Solved Example using `sample(50)`
 
 ```{r}
-
-
+Sample <- 
+  Addresses %>%
+  sample_n(size = 50)
 ```
+- First, gather a sample subset of 50 random cases.
 
-## Recreate Soved Example using the entire `Address` data set
+```{r}
+Matches <- 
+  Sample %>%
+  filter(grepl(pattern = "PO", address))
+
+Dont <- 
+  Sample %>%
+  filter( !grepl(pattern = "PO", address))
+```
+- Attempt to filter out all of the cases containing "PO" (indicating they contain a PO BOX in their address). Contain these cases within two data frames, a *Matches* df for addresses with "PO" and a *Dont* df for those that do not.  
+
+```{r}
+head(Matches)
+head(Dont)
+```
+- In the *Matches* df, most of the cases look like they belong their (based on the head of the df), but after a quick glance at the *Dont* df, it is obvious there are errors. One of the addresses contains "P O" instead of "PO" so it was mistakenly included in the *Dont* df. On top of that, some cases have "NCSU" instead of "PO", so we need to readjust our statement to correctly capture all of the cases into their appropriate data frames.
+
+```{r}
+pattern <- "BOX\\s+(\\d+)"
+
+Matches <- 
+  Sample %>% 
+  filter(grepl(pattern, address))
+
+Dont <-
+  Sample %>%
+  filter( !grepl(pattern, address))
+```
+- The improved pattern calls for "BOX" followed by numbers.
+
+```{r}
+head(Matches)
+head(Dont)
+```
+- Now the *Addresses* data frame has been much more accuratley split into groupings.
+
+
+## Recreate Solved Example using the entire `Address` data set
 
 ```{r}
 
