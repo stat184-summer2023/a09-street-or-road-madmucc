@@ -65,15 +65,38 @@ Dont <-
 head(Matches)
 head(Dont)
 ```
-- Now the *Addresses* data frame has been much more accuratley split into groupings.
+- Now the *Addresses* data frame has been much more accurately split into groupings.
 
 
 ## Recreate Solved Example using the entire `Address` data set
 
 ```{r}
+address_box <-
+  Addresses %>% 
+  filter(grepl(pattern, address))
 
-
+address_no_box <-
+  Addresses %>% 
+  filter(!grepl(pattern, address))
 ```
+- Using the same **filter()** function on the entire *Addresses* dataset.
+
+```{r}
+sample_n(address_box, 10)
+sample_n(address_no_box, 10)
+```
+- Based on the random sample from each of these new subset data frames, both appear to be properly sorted.
+
+```{r}
+BoxNumbers <- 
+  Addresses %>%
+  filter(grepl(pattern, address)) %>%
+  tidyr::extract(address, into = "boxnum", regex = pattern)
+
+sample_n(BoxNumbers,10)
+```
+- Now we are able to extract and view all of the individual cases box numbers.
+
 
 #### Additional Question: How many addresses are a PO BOX (including NCSU BOX)? 
 
