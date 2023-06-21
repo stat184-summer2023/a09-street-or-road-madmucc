@@ -173,10 +173,8 @@ endings %>%
   group_by(end) %>%
   summarise(total=n()) %>%
   arrange(desc(total))
-  
 ```
-- After grouping the data by their street endings, counting up the totals and sorting in descending order, it is easy to see that "ST" is the most commonly used in this dataset, with over 906 cases. The Second and third highest were "DR" at 781 and "RD" at 756. Overall, it seems the abbreviated names ("RD" vs "ROAD") tend to be more commonly used.
-
+- After grouping the data by their street endings, counting up the totals and sorting in descending order, it is easy to see that "ST" is the most commonly used in this dataset, with over 906 cases. The Second and third highest were "DR" at 781 and "RD" at 756.
 
 
 #### Additional Question 2: Present your result by using ggplot to a bar chart in descending order of popularity for the street name endings you found previously.
@@ -184,9 +182,10 @@ endings %>%
 Note: make sure your order street names according to popularity, not alphabetically.
 
 ```{r}
-
+endings %>%
+  ggplot() + geom_bar(aes(x=end))
 ```
 
 #### Additional Question 3: Comment on any patterns you see
+-  Overall, it seems the abbreviated names ("RD" vs "ROAD") tend to be more commonly used.
 
-My answer here.......
