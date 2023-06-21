@@ -101,11 +101,9 @@ sample_n(BoxNumbers,10)
 #### Additional Question: How many addresses are a PO BOX (including NCSU BOX)? 
 
 ```{r}
-
-
+nrow(BoxNumbers)
 ```
-
-My answer here...... 
+- By using **nrow()** on the *BoxNumbers* data frame, we can find thta there are 11,100 box number addresses in the original *Addresses* df. 
 
 
 ## Back to the Streets: Your Turn
@@ -122,24 +120,64 @@ LeftOvers <-
           )
 ```
 
-My answer here.......
+- The first line identifies the pattern we want to find in the data. In this case, the pattern is the detection of one of three strings: "ST", "RD", or "ROAD". 
+- The second line is creating the name for a new variable which the following lines of code will determine its value(s).
+- The third line of code takes in the *Addresses* data to be wrangled.
+- The fourth line begins a **filter()** statement on the *Addresses* df. The first statement within that function is a call to **grepl()** looking to identify any ***address*** that DOES NOT contain the pattern identified in line one.
+- The next line is a continuation of the **filter()** function and contains another **grepl()** statement, which is looking for an ***address*** containing "APT" or "UNITS" with spaces before/after either one and numbers afterwards. 
+- The final **grepl()** statement is searching for any ***address*** containing " BOX ".
+- Together this **grepl()** statements work together to find a new subset of addresses (Addresses that are not apartments, units, or boxes and addresses that have nto already been identified by the pattern) and store them in the newly created variable *LeftOvers*. With this new df, it is easy to look at what other endings addresses have and add them to the pattern if desired.
+
 
 #### Part 2: Implement your method on the entire `Addresses` data set. Explain how your code works line by line.
 
 ```{r}
+pattern <- "(ST|RD|ROAD|STREET|CIRCLE|DR|AVE|LANE|ROAD|DRIVE|BLVD|CT|LN|COURT|WAY)"
 
+LeftOvers <-
+  Addresses %>% 
+  filter( !grepl(pattern, address),
+          !grepl("\\sAPT|UNIT\\s[\\d]+$", address),
+          !grepl(" BOX ", address)
+          )
 
-
+sample_n(LeftOvers,10)
 ```
+- After reiterating through and revising my pattern, I have found what seem to be the most popularly used endings for addresses.
+- The first line identifies the pattern, which in this case is just a series of different common endings for addresses/street names using **or**.
+- All of the other lines do exactly as they did above, but this time use my pattern instead of the pattern from the book.
 
-My answer here.......
+```{r}
+pop_endings <-
+  Addresses %>%
+  filter(grepl(pattern, address))
+
+sample_n(pop_endings,10)
+```
+- I will sort addresses with popular endings into a new df called *pop_endings*. 
+- The first line of code creates a new variable name *pop_endings* which will store my new df.
+- The second line takes the *Addresses* df and gets it ready for wrangling.
+- The third line uses **filter()** and **grepl()** to extract any addresses with my pattern into my new df.
 
 #### Additional Question 1: Present your result from part 2 by providing a table in descending order of popularity for the street name endings you found
 
 ```{r}
-
-
+endings <- 
+  pop_endings %>%
+  tidyr::extract(address, into = "end", regex = pattern)
 ```
+- This code extracts all of the popular endings into their own df called *endings*, this way, we can count and sort them by popularity much easier.
+
+```{r}
+endings %>%
+  group_by(end) %>%
+  summarise(total=n()) %>%
+  arrange(desc(total))
+  
+```
+- After grouping the data by their street endings, counting up the totals and sorting in descending order, it is easy to see that "ST" is the most commonly used in this dataset, with over 906 cases. The Second and third highest were "DR" at 781 and "RD" at 756. Overall, it seems the abbreviated names ("RD" vs "ROAD") tend to be more commonly used.
+
+
 
 #### Additional Question 2: Present your result by using ggplot to a bar chart in descending order of popularity for the street name endings you found previously.
 
